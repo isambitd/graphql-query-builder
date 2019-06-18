@@ -1,0 +1,27 @@
+{
+  "name": "graphql-query-builder-json",
+  "version": "1.0.0",
+  "description": "This is a query builder to build any query, mutation, subscription from a json object",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "mocha --require ts-node/register test/*.ts"
+  },
+  "author": "Sambit Das",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/chai": "^4.1.7",
+    "@types/mocha": "^5.2.6",
+    "ts-node": "^8.2.0",
+    "typescript": "^2.9.2"
+  },
+  "dependencies": {
+    "chai": "^4.2.0"
+  },
+  "prettier": {
+    "tabWidth": 2,
+    "semi": true,
+    "trailingComma": "none"
+  }
+}
