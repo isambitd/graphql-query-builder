@@ -1,5 +1,3 @@
-import { buildQuery } from "./index";
-
 const input = {
   type: "query",
   name: "fetchBooks",

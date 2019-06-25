@@ -1,82 +1,99 @@
-const types = {
-  interface: "interface",
-  union: "union"
+interface IVariables {
+  [key: string]: IVariables | string | number | Date | [IVariables];
+}
+
+interface IArguments {
+  [key: string]: string;
+}
+
+interface IMap {
+  type?: "interface" | "union";
+  entity: string;
+  project?: Array<IMap | string>;
+  args?: IArgs[];
+}
+
+interface IArgs {
+  name: string;
+  graphQlType: string;
+  value: any;
+}
+
+interface InputPayload {
+  type: "query" | "mutation";
+  name: string;
+  map: IMap;
+}
+
+interface IBuildFieldInput {
+  map: IMap;
+  variables: IVariables;
+  args: IArguments;
+  identifier: number;
+}
+interface IQuery {
+  query: string;
+  variables: IVariables;
+  args: IArguments;
+}
+
+const formatArguments = (args: IArguments): string => {
+  return args && Object.keys(args).length
+    ? `(${Object.keys(args).map(key => `${key}: ${args[key]}`)})`
+    : ``;
 };
 
-const buildQuery = (obj: { [key: string]: any }) => {
-  const { variables, newQuery, newHeader } = bindFields({
-    obj: obj.data,
-    variableObj: {},
-    header: {},
-    identifier: 1,
-    level: 2
+const build = (input: InputPayload) => {
+  const { variables, query, args } = bindProjections({
+    map: input.map,
+    variables: {} as IVariables,
+    args: {} as IArguments,
+    identifier: 1
   });
   return {
-    query: `${obj.type} ${obj.name} ${
-      newHeader && Object.keys(newHeader).length
-        ? `(${Object.keys(newHeader).map(key => `${key}: ${newHeader[key]}`)})`
-        : ``
-    } {\n${newQuery}}`,
+    query: `${input.type} ${input.name} ${formatArguments(args)} {${query}}`,
     variables
   };
 };
-const bindFields = ({
-  obj,
-  variableObj,
-  header,
-  identifier,
-  level
-}: {
-  obj: { [key: string]: any };
-  variableObj: { [key: string]: any };
-  header: { [key: string]: any };
-  identifier: number;
-  level: number;
-}) => {
+
+const bindProjections = (input: IBuildFieldInput): IQuery => {
   return {
-    newQuery: `${Array.from(Array(level))
-      .map(x => `\t`)
-      .join("")}${
-      (obj.type && obj.type === types.union) || obj.type === types.interface
+    query: `${
+      input.map.type === "interface" || input.map.type === "union"
         ? `... on `
         : ``
-    }${obj.name} ${
-      obj.args
-        ? `(${obj.args.map((el: any[]) => {
-            const newIdentifier = identifier++;
-            header["$x" + newIdentifier] = el[1];
-            variableObj["x" + newIdentifier] = el[2];
-            return `${el[0]}: $x${newIdentifier}`;
-          })})`
+    }${input.map.entity} ${
+      input.map.args
+        ? `(${input.map.args.map((el: IArgs) => {
+            const newIdentifier = input.identifier++;
+            input.args["$var" + newIdentifier] = el.graphQlType;
+            input.variables["var" + newIdentifier] = el.value;
+            return `${el.name}: $var${newIdentifier}`;
+          })}) `
         : ``
     }${
-      obj.props
-        ? `{\n${obj.props
-            .map((el: string | { [key: string]: any }) => {
+      input.map.project
+        ? `{ ${input.map.project
+            .map((el: IMap | string) => {
               if (typeof el === "string") {
-                return `${Array.from(Array(level + 1))
-                  .map(x => `\t`)
-                  .join("")}${el}\n`;
+                return `${el} `;
               }
-              const { variables, newQuery, newHeader } = bindFields({
-                obj: el,
-                variableObj,
-                header,
-                identifier,
-                level: level + 1
+              const { variables, query, args } = bindProjections({
+                map: el,
+                variables: input.variables,
+                args: input.args,
+                identifier: input.identifier
               });
-              variableObj = { ...variableObj, ...variables };
-              header = { ...header, ...newHeader };
-              return `${newQuery}`;
+              input.variables = { ...input.variables, ...variables };
+              input.args = { ...input.args, ...args };
+              return `${query}`;
             })
-            .join(``)}${Array.from(Array(level))
-            .map(x => `\t`)
-            .join("")}}`
+            .join(``)}} `
         : ``
-    }\n`,
-    variables: variableObj,
-    newHeader: header
+    }`,
+    variables: input.variables,
+    args: input.args
   };
 };
 
-export { buildQuery };
+export { build, InputPayload };
