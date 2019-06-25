@@ -20,7 +20,7 @@ interface IArgs {
 }
 
 interface InputPayload {
-  type: "query" | "mutation";
+  type: "query" | "mutation" | "subscription";
   name: string;
   map: IMap;
 }
