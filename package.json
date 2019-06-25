@@ -25,5 +25,17 @@
     "tabWidth": 2,
     "semi": true,
     "trailingComma": "none"
-  }
+  },
+  "keywords": [
+    "graphql",
+    "query",
+    "builder",
+    "generator",
+    "orm",
+    "graphqlQueryBuilder",
+    "QueryBuilder",
+    "graphqlQueryBuilderJson",
+    "QueryBuilderJson",
+    "jsonToQuery"
+  ]
 }
