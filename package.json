@@ -1,6 +1,6 @@
 {
   "name": "graphql-query-builder-json",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "This is a query builder to build any query, mutation, subscription from a json object",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
