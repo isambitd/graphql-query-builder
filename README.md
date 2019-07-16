@@ -1,5 +1,11 @@
 # graphql-query-builder
 
+install via npm
+```
+npm i graphql-query-builder-json
+```
+
+
 The format of the json to create a GraphQL Query
 
 ```
